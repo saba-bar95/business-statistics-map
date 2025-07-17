@@ -17,7 +17,7 @@ const IndicatorsSelect = () => {
     5: 2007,
     4: 2007,
     7: 2007,
-    11: 2005,
+    11: 2007,
     12: 2007,
     10: 2006,
     9: 2006,
@@ -41,6 +41,7 @@ const IndicatorsSelect = () => {
 
   return (
     <select
+      style={{ width: "100%" }}
       value={indicator}
       name="indicatorSelect"
       id="indicator"

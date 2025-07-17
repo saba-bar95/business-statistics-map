@@ -101,7 +101,7 @@ const PieChartGenders = ({ data, year }) => {
     series.data.setAll(coloredData);
     series.appear(1000, 100);
 
-    const centerYOffset = language === "en" ? -120 : -100;
+    const centerYOffset = language === "en" ? -120 : -110;
 
     const legend = chart.children.push(
       am5.Legend.new(root, {
@@ -122,7 +122,7 @@ const PieChartGenders = ({ data, year }) => {
       fontSize: 14,
       fontWeight: "600",
       fontFamily: "Verdana",
-      oversizedBehavior: "wrap",
+      oversizedBehavior: "truncate",
       maxWidth: 200,
     });
 

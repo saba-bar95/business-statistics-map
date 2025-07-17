@@ -5,6 +5,7 @@ import { QueriesContext } from "../../../../../App";
 import { useParams } from "react-router";
 import PieChart from "./PieChart";
 import PieChartGenders from "./PieChartGenders";
+import Download from "./Download/Download";
 
 const BusinessDiagram = () => {
   const {
@@ -22,8 +23,11 @@ const BusinessDiagram = () => {
 
   return (
     <div className="business-indicator">
-      <div className="container">
+      <div
+        className="container"
+        style={{ position: "relative", width: "100%" }}>
         <IndicatorsSelect />
+        <Download />
       </div>
       <div className="container">
         <YearsSelect />
