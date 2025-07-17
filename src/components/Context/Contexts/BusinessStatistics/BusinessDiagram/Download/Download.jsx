@@ -1,8 +1,9 @@
 import { useParams } from "react-router";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { QueriesContext } from "../../../../../../App";
 import "./Download.scss";
-import DownloadExcel from "./DownloadExcel";
-import DownloadPDF from "./DownloadPDF";
+import downloadExcel from "./downloadExcel";
+import downloadPDF from "./downloadPDF";
 import downloadJPG from "./downloadJPG";
 
 const Download = () => {
@@ -10,16 +11,39 @@ const Download = () => {
   const [showWrapper, setShowWrapper] = useState(false);
   const { language } = useParams();
 
-  const handleDownload = (e, format) => {
+  const { regData, indicator, indicators, indicatorYear, indicatorInfo } =
+    useContext(QueriesContext);
+
+  const unit = indicatorInfo[`measurement_${language}`];
+  const isGender = indicator === indicators[11] || indicator === indicators[12];
+  const isEmployees = indicator === indicators[11];
+
+  const handleDownload = (event, format) => {
     switch (format) {
       case "jpg":
-        downloadJPG(e);
+        downloadJPG(event);
         break;
       case "pdf":
-        DownloadPDF();
+        downloadPDF(
+          language,
+          regData,
+          indicatorYear,
+          indicator,
+          unit,
+          isGender,
+          isEmployees
+        );
         break;
       case "xlsx":
-        DownloadExcel();
+        downloadExcel(
+          language,
+          regData,
+          indicatorYear,
+          indicator,
+          unit,
+          isGender,
+          isEmployees
+        );
         break;
       default:
         console.warn("Unknown format:", format);
