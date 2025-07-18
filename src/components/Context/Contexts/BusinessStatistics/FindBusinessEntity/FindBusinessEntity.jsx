@@ -1,5 +1,3 @@
-import "./FindBusinessEntity.scss";
-
 const FindBusinessEntity = () => {
   return (
     <>
