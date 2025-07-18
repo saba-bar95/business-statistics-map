@@ -10,6 +10,7 @@ import getIndicators from "./functions/getIndicators";
 import getIntervals from "./functions/getIntervals";
 import fetchData from "./functions/fetchData";
 import fetchPayGender from "./functions/fetchPayGender";
+import fetchRegionData from "./functions/fetchRegionData";
 
 export const QueriesContext = createContext();
 
@@ -28,6 +29,42 @@ function App() {
   const [indicatorInfo, setIndicatorInfo] = useState(
     () => getIntervals(language)[getIndicators(language)[indicatorIndex]]
   );
+  const [selectedRegionID, setSelectedRegionID] = useState(11);
+  const [yearlyRegionData, setYearlyRegionData] = useState([]);
+
+  const fetchMultipleYears = async (regionID, startYear, endYear) => {
+    const results = [];
+
+    for (let year = startYear; year <= endYear; year++) {
+      try {
+        const data = await fetchRegionData(regionID, year);
+        if (!data) throw new Error(`No data for year ${year}`);
+
+        const number = data[`w_${year}`];
+        results.push({ year, number });
+      } catch (error) {
+        console.log(`Error fetching data for year ${year}:`, error.message);
+      }
+    }
+
+    return results;
+  };
+
+  useEffect(() => {
+    if (!selectedRegionID || !indicatorYear) return;
+
+    const fetchData = async () => {
+      const dataArray = await fetchMultipleYears(
+        selectedRegionID,
+        indicatorYear,
+        2022
+      );
+      setYearlyRegionData(dataArray);
+      console.log(dataArray); // See what you've got
+    };
+
+    fetchData();
+  }, [selectedRegionID, indicatorYear]);
 
   useEffect(() => {
     const newIndicators = getIndicators(language);
@@ -135,6 +172,9 @@ function App() {
         indicatorInfo,
         setIndicator,
         setIndicatorIndex,
+        selectedRegionID,
+        setSelectedRegionID,
+        yearlyRegionData,
       }}>
       <div className="app-container">
         <Navigation />
