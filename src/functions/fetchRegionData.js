@@ -1,9 +1,9 @@
 import backEndUrl from "../BackEndUrl";
 
-const fetchRegionData = async (regionID, year) => {
+const fetchRegionData = async (indicator, regionID, year) => {
   try {
     const response = await fetch(
-      `${backEndUrl}/api/getRegBrunva/${regionID}?year=${year}`
+      `${backEndUrl}/api/getReg${indicator}/${regionID}?year=${year}`
     );
 
     if (!response.ok) {
