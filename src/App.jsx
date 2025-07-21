@@ -11,6 +11,7 @@ import getIntervals from "./functions/getIntervals";
 import fetchData from "./functions/fetchData";
 import fetchPayGender from "./functions/fetchPayGender";
 import fetchRegionData from "./functions/fetchRegionData";
+import fetchRegionGenderData from "./functions/fetchRegionGenderData";
 
 export const QueriesContext = createContext();
 
@@ -32,39 +33,86 @@ function App() {
   const [selectedRegionID, setSelectedRegionID] = useState(11);
   const [yearlyRegionData, setYearlyRegionData] = useState([]);
 
-  const fetchMultipleYears = async (regionID, startYear, endYear) => {
-    const results = [];
+  const indicatorMap = useMemo(
+    () => ({
+      [indicators[0]]: "Brunva",
+      [indicators[1]]: "ValAdded",
+      [indicators[2]]: "Employed",
+      [indicators[3]]: "Employees",
+      [indicators[4]]: "Resale",
+      [indicators[5]]: "Investment",
+      [indicators[6]]: "ProdVal",
+      [indicators[7]]: "Purchases",
+      [indicators[8]]: "Remuneration",
+      [indicators[9]]: "Costs",
+      [indicators[10]]: "IntConsumption",
+      [indicators[11]]: "RegEmployeesGender",
+      [indicators[12]]: "PayGender",
+    }),
+    [indicators]
+  );
 
+  const fetchYears = async (
+    fetchFn,
+    indicator,
+    regionID,
+    startYear,
+    endYear,
+    formatter
+  ) => {
+    const results = [];
     for (let year = startYear; year <= endYear; year++) {
       try {
-        const data = await fetchRegionData(regionID, year);
+        const data = await fetchFn(indicator, regionID, year);
         if (!data) throw new Error(`No data for year ${year}`);
-
-        const number = data[`w_${year}`];
-        results.push({ year, number });
+        results.push(formatter(data, year));
       } catch (error) {
         console.log(`Error fetching data for year ${year}:`, error.message);
       }
     }
-
     return results;
   };
+
+  const formatSingleData = (data, year) => ({
+    year,
+    number: data[`w_${year}`],
+  });
+
+  const formatGenderData = (data, year) => ({
+    year,
+    maleNumber: data[`m_${year}`],
+    femaleNumber: data[`f_${year}`],
+  });
 
   useEffect(() => {
     if (!selectedRegionID || !indicatorYear) return;
 
     const fetchData = async () => {
-      const dataArray = await fetchMultipleYears(
+      const indicatorKey = indicatorMap[indicator];
+      const isGender =
+        indicator === indicators[11] || indicator === indicators[12];
+      const fetchFn = isGender ? fetchRegionGenderData : fetchRegionData;
+      const formatter = isGender ? formatGenderData : formatSingleData;
+      const usedIndicator = isGender
+        ? indicator === indicators[11]
+          ? "EmployeesGender"
+          : "PayGender"
+        : indicatorKey;
+
+      const dataArray = await fetchYears(
+        fetchFn,
+        usedIndicator,
         selectedRegionID,
         indicatorYear,
-        2022
+        2022,
+        formatter
       );
+
       setYearlyRegionData(dataArray);
-      console.log(dataArray); // See what you've got
     };
 
     fetchData();
-  }, [selectedRegionID, indicatorYear]);
+  }, [selectedRegionID, indicatorYear, indicator, indicatorMap, indicators]);
 
   useEffect(() => {
     const newIndicators = getIndicators(language);
@@ -99,25 +147,6 @@ function App() {
 
     fetchAllData();
   }, []);
-
-  const indicatorMap = useMemo(
-    () => ({
-      [indicators[0]]: "Brunva",
-      [indicators[1]]: "ValAdded",
-      [indicators[2]]: "Employed",
-      [indicators[3]]: "Employees",
-      [indicators[4]]: "Resale",
-      [indicators[5]]: "Investment",
-      [indicators[6]]: "ProdVal",
-      [indicators[7]]: "Purchases",
-      [indicators[8]]: "Remuneration",
-      [indicators[9]]: "Costs",
-      [indicators[10]]: "IntConsumption",
-      [indicators[11]]: "RegEmployeesGender",
-      [indicators[12]]: "PayGender",
-    }),
-    [indicators]
-  );
 
   useEffect(() => {
     const runFetch = async () => {
