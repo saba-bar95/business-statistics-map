@@ -18,7 +18,7 @@ const RegionSelect = () => {
       value={selectedRegionID ?? ""}
       onChange={handleRegionChange}>
       {regData
-        .filter((reg) => reg.region_id !== "12" && reg.region_id !== "48")
+        .filter((reg) => reg.region_id != "12" && reg.region_id != "48")
         .sort((a, b) => Number(a.region_id) - Number(b.region_id)) // 🔽 Descending sort
         .map((reg) => (
           <option key={reg.region_id} value={reg.region_id}>
