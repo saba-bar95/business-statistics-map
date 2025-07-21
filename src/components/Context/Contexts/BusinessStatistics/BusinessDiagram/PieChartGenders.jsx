@@ -149,7 +149,11 @@ const PieChartGenders = ({ data, year }) => {
     return () => root.dispose();
   }, [coloredData, language]);
 
-  return <div id="chartdiv" style={{ width: "300px", height: "100%" }}></div>;
+  return (
+    <div style={{ width: "100%", maxHeight: "80vh", overflow: "auto" }}>
+      <div id="chartdiv" style={{ width: "300px", minHeight: "700px" }}></div>
+    </div>
+  );
 };
 
 export default PieChartGenders;

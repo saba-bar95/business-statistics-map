@@ -1,14 +1,13 @@
 // src/navigation/navigation.scss
 .navigation {
-  height: 100vh; /* Set a height for the sticky element */
   width: max-content; /* Set a width for the sticky element */
   position: sticky; /* Make it sticky */
   top: 0; /* Stick to the top of the viewport */
-  z-index: 1; /* Ensure it appears above other content */
+  z-index: 99; /* Ensure it appears above other content */
   padding: 10px; /* Optional padding */
 
   .navigation-container {
-    height: 100%;
+    min-height: 100vh; /* Set a height for the sticky element */
     border: 2px solid gray;
     display: flex;
     transition: all 0.3s ease; /* Smooth transition for the container */
