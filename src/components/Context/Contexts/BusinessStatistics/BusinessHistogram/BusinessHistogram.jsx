@@ -4,17 +4,21 @@ import RegionSelect from "../RegionSelect";
 import { useContext } from "react";
 import { QueriesContext } from "../../../../../App";
 import { useParams } from "react-router";
+import Download from "../BusinessDiagram/Download/Download";
+import BarChart from "./BarChart";
+import BarChartGenders from "./BarChartGenders";
 
 const BusinessHistogram = () => {
   const {
     selectedQuery,
     indicator,
+    indicators,
     indicatorInfo,
-    indicatorYear,
     yearlyRegionData,
   } = useContext(QueriesContext);
 
   const { language } = useParams();
+  const isGender = indicator === indicators[11] || indicator === indicators[12];
 
   return (
     <div className="business-indicator">
@@ -42,11 +46,14 @@ const BusinessHistogram = () => {
           )}
         </p>
 
-        <p className="diagram-p">
-          {language === "en" ? "Year" : "წელი"}{" "}
-          <span className="diagram-span">{indicatorYear}</span>
-        </p>
+        <Download isHistogram={true} />
       </div>
+
+      {!isGender ? (
+        <BarChart data={yearlyRegionData} />
+      ) : (
+        <BarChartGenders data={yearlyRegionData} />
+      )}
     </div>
   );
 };
