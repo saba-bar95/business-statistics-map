@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useParams } from "react-router";
 import { useState, useContext } from "react";
 import { QueriesContext } from "../../../../../../App";
@@ -6,7 +7,11 @@ import downloadExcel from "./downloadExcel";
 import downloadPDF from "./downloadPDF";
 import downloadJPG from "./downloadJPG";
 
-const Download = () => {
+const Download = ({ isHistogram }) => {
+  const downloadClasses = isHistogram
+    ? "download-container hist-download-container"
+    : "download-container";
+
   const formats = ["jpg", "pdf", "xlsx"];
   const [showWrapper, setShowWrapper] = useState(false);
   const { language } = useParams();
@@ -51,7 +56,7 @@ const Download = () => {
   };
 
   return (
-    <div className="download-container">
+    <div className={downloadClasses}>
       <div className="dropdown-container">
         {showWrapper && (
           <div
