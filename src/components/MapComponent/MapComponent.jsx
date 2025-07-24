@@ -158,7 +158,7 @@ const MapComponent = () => {
                   {regionMaleNumber && (
                     <p>
                       <span style={{ fontWeight: 900 }}>
-                        {language === "en" ? "Male" : "კაცი"}
+                        {language === "en" ? "Male" : "მამაკაცი"}
                       </span>
                       : {regionMaleNumber}
                       {indicator === indicators[12] && (
