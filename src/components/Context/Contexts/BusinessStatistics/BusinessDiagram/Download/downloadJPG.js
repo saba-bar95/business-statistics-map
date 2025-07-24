@@ -1,6 +1,6 @@
 import html2canvas from "html2canvas";
 
-const downloadJPG = (e) => {
+const downloadJPG = (e, indicator, indicatorYear) => {
   // Find the closest parent element with the class 'main-chart'
   const chartElement = document.querySelector("#chartdiv");
 
@@ -20,7 +20,7 @@ const downloadJPG = (e) => {
   }).then((canvas) => {
     const link = document.createElement("a");
     link.href = canvas.toDataURL("image/jpeg", 1.0);
-    link.download = "chart.jpg";
+    link.download = `${indicator} (${indicatorYear}).jpg`;
     link.click();
   });
 };
