@@ -15,6 +15,7 @@ const BusinessHistogram = () => {
     indicators,
     indicatorInfo,
     yearlyRegionData,
+    selectedRegion,
   } = useContext(QueriesContext);
 
   const { language } = useParams();
@@ -45,7 +46,9 @@ const BusinessHistogram = () => {
             <> ({indicatorInfo[`measurement_${language}`]})</>
           )}
         </p>
-
+        <p className="diagram-p">
+          {language === "en" ? "Region:" : "რეგიონი:"} {selectedRegion}
+        </p>
         <Download isHistogram={true} />
       </div>
 

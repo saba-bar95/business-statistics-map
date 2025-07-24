@@ -31,7 +31,17 @@ function App() {
     () => getIntervals(language)[getIndicators(language)[indicatorIndex]]
   );
   const [selectedRegionID, setSelectedRegionID] = useState(11);
+  const [selectedRegion, setSelectedRegion] = useState(null);
   const [yearlyRegionData, setYearlyRegionData] = useState([]);
+
+  useEffect(() => {
+    if (regData && selectedRegionID) {
+      const region = regData.find((reg) => reg.region_id == selectedRegionID);
+      if (region) {
+        setSelectedRegion(region[`name_${language}`]);
+      }
+    }
+  }, [regData, selectedRegionID, language]);
 
   const indicatorMap = useMemo(
     () => ({
@@ -204,6 +214,8 @@ function App() {
         selectedRegionID,
         setSelectedRegionID,
         yearlyRegionData,
+        selectedRegion,
+        setSelectedRegion,
       }}>
       <div className="app-container">
         <Navigation />
