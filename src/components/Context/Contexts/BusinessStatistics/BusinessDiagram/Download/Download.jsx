@@ -6,6 +6,8 @@ import "./Download.scss";
 import downloadExcel from "./downloadExcel";
 import downloadPDF from "./downloadPDF";
 import downloadJPG from "./downloadJPG";
+import downloadHistogramExcel from "./downloadHistogramExcel";
+import downloadHistogramPDF from "./downloadHistogramPDF";
 
 const Download = ({ isHistogram }) => {
   const downloadClasses = isHistogram
@@ -16,8 +18,15 @@ const Download = ({ isHistogram }) => {
   const [showWrapper, setShowWrapper] = useState(false);
   const { language } = useParams();
 
-  const { regData, indicator, indicators, indicatorYear, indicatorInfo } =
-    useContext(QueriesContext);
+  const {
+    regData,
+    indicator,
+    indicators,
+    indicatorYear,
+    indicatorInfo,
+    yearlyRegionData,
+    selectedRegion,
+  } = useContext(QueriesContext);
 
   const unit = indicatorInfo[`measurement_${language}`];
   const isGender = indicator === indicators[11] || indicator === indicators[12];
@@ -26,29 +35,55 @@ const Download = ({ isHistogram }) => {
   const handleDownload = (event, format) => {
     switch (format) {
       case "jpg":
-        downloadJPG(event);
+        downloadJPG(event, indicator, indicatorYear);
         break;
       case "pdf":
-        downloadPDF(
-          language,
-          regData,
-          indicatorYear,
-          indicator,
-          unit,
-          isGender,
-          isEmployees
-        );
+        if (isHistogram) {
+          downloadHistogramPDF(
+            language,
+            yearlyRegionData,
+            indicatorYear,
+            indicator,
+            unit,
+            isGender,
+            isEmployees,
+            selectedRegion
+          );
+        } else {
+          downloadPDF(
+            language,
+            regData,
+            indicatorYear,
+            indicator,
+            unit,
+            isGender,
+            isEmployees
+          );
+        }
         break;
       case "xlsx":
-        downloadExcel(
-          language,
-          regData,
-          indicatorYear,
-          indicator,
-          unit,
-          isGender,
-          isEmployees
-        );
+        if (isHistogram) {
+          downloadHistogramExcel(
+            language,
+            yearlyRegionData,
+            indicatorYear,
+            indicator,
+            unit,
+            isGender,
+            isEmployees,
+            selectedRegion
+          );
+        } else {
+          downloadExcel(
+            language,
+            regData,
+            indicatorYear,
+            indicator,
+            unit,
+            isGender,
+            isEmployees
+          );
+        }
         break;
       default:
         console.warn("Unknown format:", format);
