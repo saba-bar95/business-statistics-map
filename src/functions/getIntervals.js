@@ -288,7 +288,7 @@ const getIntervals = (language) => {
         color: "#8f0a0a",
       },
       measurement_ge: "კაცი",
-      measuremet_en: "men",
+      measurement_en: "men",
     },
     [getIndicators(language)[12]]: {
       "1para": {
