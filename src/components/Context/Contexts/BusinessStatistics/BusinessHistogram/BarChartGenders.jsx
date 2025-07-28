@@ -162,10 +162,9 @@ const BarChartGenders = ({ data }) => {
   }, [formattedData, femaleText, maleText]);
 
   return (
-    <div
-      id="chartdiv"
-      style={{ width: "100%", height: "550px", marginTop: "30px" }}
-    />
+    <div style={{ width: "100%", maxHeight: "80vh", overflow: "auto" }}>
+      <div id="chartdiv" style={{ width: "300px", minHeight: "550px" }}></div>
+    </div>
   );
 };
 
