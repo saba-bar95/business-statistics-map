@@ -13,7 +13,7 @@ const getStyle = (feature, zoomLevel, type, color) => {
   if (zoomLevel > 8 && type === "region") {
     if (id === 48 || id === 12) {
       return {
-        color: "red",
+        color: "transparent",
         weight: 3,
         fillColor: "rgba(255, 0, 0, 0.5)",
         fillOpacity: 0.5,
@@ -30,7 +30,7 @@ const getStyle = (feature, zoomLevel, type, color) => {
   if (zoomLevel <= 8 && type === "region") {
     if (id === 48 || id === 12) {
       return {
-        color: "red",
+        color: "transparent",
         weight: 3,
         fillColor: "rgba(255, 0, 0, 0.5)",
         fillOpacity: 0.5,

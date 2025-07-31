@@ -2,25 +2,22 @@ import {
   MapContainer,
   TileLayer,
   Popup,
-  // Marker,
+  Marker,
   LayersControl,
   GeoJSON,
 } from "react-leaflet";
-import { useState, useContext } from "react";
+import { useState, useContext, useRef, useEffect, useCallback } from "react";
 import "leaflet/dist/leaflet.css";
 import "./MapComponent.scss";
 import regions from "../../coordinates/regions";
 import municipalities from "../../coordinates/municipalities";
 import getStyle from "../../functions/getStyle";
-import onEachFeature from "../../functions/onEachFeature";
 import MapEventsHandler from "../../functions/MapEventsHandler";
 import { QueriesContext } from "../../App";
 import checkNumberRange from "../../functions/checkNumberRange";
 import { useParams } from "react-router";
-
-// import MarkerClusterGroup from "react-leaflet-markercluster";
-// import createCustomClusterIcon from "../../functions/createCustomClusterIcon";
-// import markers from "../../coordinates/markers";
+import MarkerClusterGroup from "react-leaflet-markercluster";
+import createCustomClusterIcon from "../../functions/createCustomClusterIcon";
 
 const MapComponent = () => {
   const [zoomLevel, setZoomLevel] = useState(8);
@@ -33,8 +30,47 @@ const MapComponent = () => {
     indicators,
     indicatorYear,
     indicatorInfo,
+    companiesData,
   } = useContext(QueriesContext);
   const { language } = useParams();
+
+  const [regionsReady, setRegionsReady] = useState(false);
+
+  const regionRefs = useRef({});
+
+  const setupHoverListeners = useCallback(() => {
+    Object.values(regionRefs.current).forEach((geoJsonLayer) => {
+      if (geoJsonLayer) {
+        geoJsonLayer.eachLayer((layer) => {
+          layer.off("mouseover");
+          layer.off("mouseout");
+
+          layer.on("mouseover", (e) => {
+            if (zoomLevel < 9) {
+              e.target.setStyle({
+                weight: 5,
+                fillOpacity: 0.7,
+              });
+            }
+          });
+
+          layer.on("mouseout", (e) => {
+            if (zoomLevel < 9) {
+              e.target.setStyle({
+                weight: 3,
+                fillOpacity: 0.5,
+              });
+            }
+          });
+        });
+      }
+    });
+  }, [zoomLevel]); // 👈
+
+  useEffect(() => {
+    if (!regionsReady) return;
+    setupHoverListeners();
+  }, [regionsReady, setupHoverListeners]);
 
   return (
     <>
@@ -76,13 +112,27 @@ const MapComponent = () => {
             </LayersControl.BaseLayer>
           </LayersControl.BaseLayer>
         </LayersControl>
-        {/* <MarkerClusterGroup iconCreateFunction={createCustomClusterIcon}>
-          {markers.map((marker, index) => (
-            <Marker key={index} position={marker.geocode}>
-              <Popup>{marker.popupText}</Popup>
-            </Marker>
-          ))}
-        </MarkerClusterGroup> */}
+
+        {companiesData && Array.isArray(companiesData) && (
+          <MarkerClusterGroup iconCreateFunction={createCustomClusterIcon}>
+            {companiesData.map((company, index) => {
+              const { X, Y, Full_Name, Address } = company;
+
+              // Only render if coordinates are valid numbers
+              if (typeof X !== "number" || typeof Y !== "number") return null;
+
+              return (
+                <Marker key={index} position={[X, Y]}>
+                  <Popup>
+                    <strong>{Full_Name}</strong>
+                    <br />
+                    {Address}
+                  </Popup>
+                </Marker>
+              );
+            })}
+          </MarkerClusterGroup>
+        )}
 
         {regData &&
           Object.entries(regions).map(([key, value]) => {
@@ -118,12 +168,19 @@ const MapComponent = () => {
 
             return (
               <GeoJSON
+                ref={(el) => {
+                  regionRefs.current[key] = el;
+
+                  if (
+                    Object.keys(regionRefs.current).length ===
+                    Object.entries(regions).length
+                  ) {
+                    setRegionsReady(true);
+                  }
+                }}
                 key={key}
                 data={value}
-                style={getStyle(value, zoomLevel, "region", regColor)}
-                onEachFeature={(feature, layer) => {
-                  onEachFeature(feature, layer);
-                }}>
+                style={getStyle(value, zoomLevel, "region", regColor)}>
                 <Popup>
                   <p className="popup-para">{region[`name_${language}`]}</p>
 
@@ -191,8 +248,21 @@ const MapComponent = () => {
                 key={el.properties.NAME_GE}
                 data={el}
                 style={getStyle(el, zoomLevel, "municipality", munColor)}
-                onEachFeature={(feature, layer) => {
-                  onEachFeature(feature, layer);
+                onEachFeature={(_, layer) => {
+                  layer.on({
+                    mouseover: (e) => {
+                      e.target.setStyle({
+                        weight: 5,
+                        fillOpacity: 0.7,
+                      });
+                    },
+                    mouseout: (e) => {
+                      e.target.setStyle({
+                        weight: 3,
+                        fillOpacity: 0.5,
+                      });
+                    },
+                  });
                 }}>
                 <Popup>
                   <p className="popup-para">
