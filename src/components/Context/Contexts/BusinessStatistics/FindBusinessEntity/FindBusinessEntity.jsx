@@ -1,8 +1,21 @@
+import RegionSelect from "./RegionSelect";
+import FormsSelect from "./FormsSelect";
+
 const FindBusinessEntity = () => {
   return (
-    <>
-      <h1>FindBusinessEntity</h1>
-    </>
+    <div className="business-indicator">
+      <div
+        className="container"
+        style={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          gap: "15px",
+        }}>
+        <RegionSelect />
+        <FormsSelect />
+      </div>
+    </div>
   );
 };
 

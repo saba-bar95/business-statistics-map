@@ -12,6 +12,8 @@ import fetchData from "./functions/fetchData";
 import fetchPayGender from "./functions/fetchPayGender";
 import fetchRegionData from "./functions/fetchRegionData";
 import fetchRegionGenderData from "./functions/fetchRegionGenderData";
+import fetchCompaniesData from "./functions/fetchCompaniesData";
+import fetchLegalForms from "./functions/fetchLegalForms";
 
 export const QueriesContext = createContext();
 
@@ -33,6 +35,10 @@ function App() {
   const [selectedRegionID, setSelectedRegionID] = useState(11);
   const [selectedRegion, setSelectedRegion] = useState(null);
   const [yearlyRegionData, setYearlyRegionData] = useState([]);
+  const [selectedFindRegionID, setSelectedFindRegionId] = useState("");
+  const [legalForms, setLegalForms] = useState("");
+  const [selectedFormID, setSelectedFormID] = useState("");
+  const [companiesData, setCompaniesData] = useState(null);
 
   useEffect(() => {
     if (regData && selectedRegionID) {
@@ -192,6 +198,48 @@ function App() {
     setMunData,
   ]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await fetchLegalForms(language);
+        if (data) setLegalForms(data);
+      } catch (err) {
+        console.error("Error fetching legal forms:", err);
+      }
+    };
+
+    fetchData();
+  }, [language, setLegalForms]);
+
+  useEffect(() => {
+    if (!selectedFindRegionID || selectedFindRegionID === 0) return;
+
+    setCompaniesData(null);
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    const fetchData = async () => {
+      try {
+        const data = await fetchCompaniesData(
+          selectedFindRegionID,
+          selectedFormID,
+          signal
+        );
+        if (data) {
+          console.log(data);
+          setCompaniesData(data);
+        }
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          console.error("Fetch error:", err);
+        }
+      }
+    };
+
+    fetchData();
+    return () => controller.abort();
+  }, [selectedFindRegionID, selectedFormID]);
+
   return (
     <QueriesContext.Provider
       value={{
@@ -216,6 +264,12 @@ function App() {
         yearlyRegionData,
         selectedRegion,
         setSelectedRegion,
+        selectedFindRegionID,
+        setSelectedFindRegionId,
+        legalForms,
+        setLegalForms,
+        setSelectedFormID,
+        companiesData,
       }}>
       <div className="app-container">
         <Navigation />
