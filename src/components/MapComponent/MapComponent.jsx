@@ -6,7 +6,14 @@ import {
   LayersControl,
   GeoJSON,
 } from "react-leaflet";
-import { useState, useContext, useRef, useEffect, useCallback } from "react";
+import {
+  useState,
+  useContext,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+} from "react";
 import "leaflet/dist/leaflet.css";
 import "./MapComponent.scss";
 import regions from "../../coordinates/regions";
@@ -34,9 +41,29 @@ const MapComponent = () => {
   } = useContext(QueriesContext);
   const { language } = useParams();
 
+  const markers = useMemo(() => {
+    if (!companiesData) return [];
+    return companiesData.map((company, index) => {
+      const { X, Y, Full_Name, Address } = company;
+      if (typeof X !== "number" || typeof Y !== "number") return null;
+
+      return (
+        <Marker key={index} position={[X, Y]}>
+          <Popup>
+            <strong>{Full_Name}</strong>
+            <br />
+            {Address}
+          </Popup>
+        </Marker>
+      );
+    });
+  }, [companiesData]);
+
   const [regionsReady, setRegionsReady] = useState(false);
+  const [munsReady, setMunsReady] = useState(false);
 
   const regionRefs = useRef({});
+  const munRefs = useRef({});
 
   const setupHoverListeners = useCallback(() => {
     Object.values(regionRefs.current).forEach((geoJsonLayer) => {
@@ -67,10 +94,44 @@ const MapComponent = () => {
     });
   }, [zoomLevel]); // 👈
 
+  const setupMunsHoverListeners = useCallback(() => {
+    Object.values(munRefs.current).forEach((geoJsonLayer) => {
+      if (geoJsonLayer) {
+        geoJsonLayer.eachLayer((layer) => {
+          layer.off("mouseover");
+          layer.off("mouseout");
+
+          layer.on("mouseover", (e) => {
+            if (zoomLevel <= 9) {
+              e.target.setStyle({
+                weight: 5,
+                fillOpacity: 0.7,
+              });
+            }
+          });
+
+          layer.on("mouseout", (e) => {
+            if (zoomLevel <= 9) {
+              e.target.setStyle({
+                weight: 3,
+                fillOpacity: 0.5,
+              });
+            }
+          });
+        });
+      }
+    });
+  }, [zoomLevel]);
+
   useEffect(() => {
     if (!regionsReady) return;
     setupHoverListeners();
   }, [regionsReady, setupHoverListeners]);
+
+  useEffect(() => {
+    if (!munsReady) return;
+    setupMunsHoverListeners();
+  }, [munsReady, setupMunsHoverListeners]);
 
   return (
     <>
@@ -115,22 +176,7 @@ const MapComponent = () => {
 
         {companiesData && Array.isArray(companiesData) && (
           <MarkerClusterGroup iconCreateFunction={createCustomClusterIcon}>
-            {companiesData.map((company, index) => {
-              const { X, Y, Full_Name, Address } = company;
-
-              // Only render if coordinates are valid numbers
-              if (typeof X !== "number" || typeof Y !== "number") return null;
-
-              return (
-                <Marker key={index} position={[X, Y]}>
-                  <Popup>
-                    <strong>{Full_Name}</strong>
-                    <br />
-                    {Address}
-                  </Popup>
-                </Marker>
-              );
-            })}
+            {markers}
           </MarkerClusterGroup>
         )}
 
@@ -245,25 +291,22 @@ const MapComponent = () => {
 
             return (
               <GeoJSON
+                ref={(geoJsonRef) => {
+                  const id = el.properties.MUNICIPAL1;
+                  if (geoJsonRef) {
+                    munRefs.current[id] = geoJsonRef;
+                  }
+
+                  if (
+                    Object.keys(munRefs.current).length ===
+                    municipalities.features.length
+                  ) {
+                    setMunsReady(true);
+                  }
+                }}
                 key={el.properties.NAME_GE}
                 data={el}
-                style={getStyle(el, zoomLevel, "municipality", munColor)}
-                onEachFeature={(_, layer) => {
-                  layer.on({
-                    mouseover: (e) => {
-                      e.target.setStyle({
-                        weight: 5,
-                        fillOpacity: 0.7,
-                      });
-                    },
-                    mouseout: (e) => {
-                      e.target.setStyle({
-                        weight: 3,
-                        fillOpacity: 0.5,
-                      });
-                    },
-                  });
-                }}>
+                style={getStyle(el, zoomLevel, "municipality", munColor)}>
                 <Popup>
                   <p className="popup-para">
                     {language === "ge"
