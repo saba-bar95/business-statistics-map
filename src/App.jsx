@@ -14,6 +14,7 @@ import fetchRegionData from "./functions/fetchRegionData";
 import fetchRegionGenderData from "./functions/fetchRegionGenderData";
 import fetchCompaniesData from "./functions/fetchCompaniesData";
 import fetchLegalForms from "./functions/fetchLegalForms";
+import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
 
 export const QueriesContext = createContext();
 
@@ -39,6 +40,7 @@ function App() {
   const [legalForms, setLegalForms] = useState("");
   const [selectedFormID, setSelectedFormID] = useState("");
   const [companiesData, setCompaniesData] = useState(null);
+  const [isLoadingCompanies, setIsLoadingCompanies] = useState(false);
 
   useEffect(() => {
     if (regData && selectedRegionID) {
@@ -212,9 +214,13 @@ function App() {
   }, [language, setLegalForms]);
 
   useEffect(() => {
-    if (!selectedFindRegionID || selectedFindRegionID === 0) return;
+    if (!selectedFindRegionID || selectedFindRegionID === 0) {
+      setCompaniesData(null);
+      return;
+    }
 
     setCompaniesData(null);
+    setIsLoadingCompanies(true); // Start loading
     const controller = new AbortController();
     const { signal } = controller;
 
@@ -226,13 +232,14 @@ function App() {
           signal
         );
         if (data) {
-          console.log(data);
           setCompaniesData(data);
         }
       } catch (err) {
         if (err.name !== "AbortError") {
           console.error("Fetch error:", err);
         }
+      } finally {
+        setIsLoadingCompanies(false); // Stop loading
       }
     };
 
@@ -272,6 +279,7 @@ function App() {
         companiesData,
       }}>
       <div className="app-container">
+        {isLoadingCompanies && <LoadingSpinner />}
         <Navigation />
         <div className="map-container">
           <MapComponent />
