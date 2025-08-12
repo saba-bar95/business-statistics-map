@@ -9,7 +9,14 @@ const RegionSelect = () => {
 
   const handleRegionChange = (e) => {
     const selectedValue = +e.target.value;
-    setSelectedFindRegionId(selectedValue);
+
+    if (isNaN(selectedValue)) {
+      setSelectedFindRegionId(null);
+    } else {
+      setSelectedFindRegionId(selectedValue);
+    }
+
+    console.log(selectedValue);
   };
 
   const text = language === "en" ? "Select Region" : "აირჩიეთ რეგიონი";
