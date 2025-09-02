@@ -15,6 +15,7 @@ import fetchRegionGenderData from "./functions/fetchRegionGenderData";
 import fetchCompaniesData from "./functions/fetchCompaniesData";
 import fetchLegalForms from "./functions/fetchLegalForms";
 import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
+import fetchActivities from "./functions/fetchActitivities";
 
 export const QueriesContext = createContext();
 
@@ -41,6 +42,8 @@ function App() {
   const [selectedFormID, setSelectedFormID] = useState("");
   const [companiesData, setCompaniesData] = useState(null);
   const [isLoadingCompanies, setIsLoadingCompanies] = useState(false);
+  const [activities, setActivities] = useState("");
+  const [selectedActivityID, setSelectedActivityID] = useState("");
 
   useEffect(() => {
     if (regData && selectedRegionID) {
@@ -203,6 +206,19 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const data = await fetchActivities(language);
+        if (data) setActivities(data);
+      } catch (err) {
+        console.error("Error fetching legal forms:", err);
+      }
+    };
+
+    fetchData();
+  }, [language, setActivities]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
         const data = await fetchLegalForms(language);
         if (data) setLegalForms(data);
       } catch (err) {
@@ -229,6 +245,7 @@ function App() {
         const data = await fetchCompaniesData(
           selectedFindRegionID,
           selectedFormID,
+          selectedActivityID,
           signal
         );
         if (data) {
@@ -245,7 +262,7 @@ function App() {
 
     fetchData();
     return () => controller.abort();
-  }, [selectedFindRegionID, selectedFormID]);
+  }, [selectedFindRegionID, selectedFormID, selectedActivityID]);
 
   return (
     <QueriesContext.Provider
@@ -274,9 +291,10 @@ function App() {
         selectedFindRegionID,
         setSelectedFindRegionId,
         legalForms,
-        setLegalForms,
         setSelectedFormID,
         companiesData,
+        activities,
+        setSelectedActivityID,
       }}>
       <div className="app-container">
         {isLoadingCompanies && <LoadingSpinner />}
