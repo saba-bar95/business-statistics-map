@@ -1,22 +1,29 @@
-const fetchCompaniesData = async (regionId, legalFormId, signal) => {
+const fetchCompaniesData = async (
+  regionId,
+  legalFormId,
+  activityId,
+  signal
+) => {
   try {
-    const baseUrl = "http://192.168.1.27:5000/api/documents";
+    const baseUrl = "http://192.168.1.27:5000/api/gis-search";
     const params = new URLSearchParams();
 
-    // Add conditional parameters
+    // Only append regionId if it's defined and not 100
     if (regionId && regionId !== 100) {
-      params.append("factualAddressRegion", regionId);
+      params.append("reg", regionId);
     }
 
     if (legalFormId) {
-      params.append("legalForm", legalFormId);
+      params.append("leg", legalFormId);
     }
 
-    // Always include these
-    params.append("x", "true");
-    params.append("y", "true");
+    if (activityId) {
+      params.append("act", activityId);
+    }
 
-    const url = `${baseUrl}?${params.toString()}`;
+    // Build URL
+    const url = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+
     const response = await fetch(url, { signal });
 
     if (!response.ok) {
@@ -31,7 +38,7 @@ const fetchCompaniesData = async (regionId, legalFormId, signal) => {
 
     return data;
   } catch (error) {
-    console.log("Companies fetch error:", error.message);
+    console.error("Companies fetch error:", error.message);
     return null;
   }
 };
