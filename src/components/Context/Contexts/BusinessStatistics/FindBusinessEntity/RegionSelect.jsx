@@ -15,8 +15,6 @@ const RegionSelect = () => {
     } else {
       setSelectedFindRegionId(selectedValue);
     }
-
-    console.log(selectedValue);
   };
 
   const text = language === "en" ? "Select Region" : "აირჩიეთ რეგიონი";
