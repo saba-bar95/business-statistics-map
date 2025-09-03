@@ -255,8 +255,6 @@ function App() {
         if (err.name !== "AbortError") {
           console.error("Fetch error:", err);
         }
-      } finally {
-        setIsLoadingCompanies(false); // Stop loading
       }
     };
 
@@ -295,6 +293,7 @@ function App() {
         companiesData,
         activities,
         setSelectedActivityID,
+        setIsLoadingCompanies,
       }}>
       <div className="app-container">
         {isLoadingCompanies && <LoadingSpinner />}

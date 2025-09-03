@@ -38,8 +38,17 @@ const MapComponent = () => {
     indicatorYear,
     indicatorInfo,
     companiesData,
+    setIsLoadingCompanies,
   } = useContext(QueriesContext);
   const { language } = useParams();
+
+  useEffect(() => {
+    if (companiesData && companiesData.length > 0) {
+      requestAnimationFrame(() => {
+        setIsLoadingCompanies(false);
+      });
+    }
+  }, [companiesData, setIsLoadingCompanies]);
 
   const markers = useMemo(() => {
     if (!companiesData) return [];
