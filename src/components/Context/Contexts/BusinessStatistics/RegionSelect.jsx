@@ -21,14 +21,15 @@ const RegionSelect = () => {
       id="region"
       value={selectedRegionID ?? ""}
       onChange={handleRegionChange}>
-      {regData
-        .filter((reg) => reg.region_id != "12" && reg.region_id != "48")
-        .sort((a, b) => Number(a.region_id) - Number(b.region_id))
-        .map((reg) => (
-          <option key={reg.region_id} value={reg.region_id}>
-            {reg[`name_${language}`]}
-          </option>
-        ))}
+      {regData &&
+        regData
+          .filter((reg) => reg.region_id != "12" && reg.region_id != "48")
+          .sort((a, b) => Number(a.region_id) - Number(b.region_id))
+          .map((reg) => (
+            <option key={reg.region_id} value={reg.region_id}>
+              {reg[`name_${language}`]}
+            </option>
+          ))}
     </select>
   );
 };
