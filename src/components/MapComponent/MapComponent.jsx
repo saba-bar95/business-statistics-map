@@ -29,6 +29,7 @@ import createCustomClusterIcon from "../../functions/createCustomClusterIcon";
 const MapComponent = () => {
   const [zoomLevel, setZoomLevel] = useState(8);
   const center = [41.9, 43.9];
+  const [selectedMarker, setSelectedMarker] = useState(null);
 
   const {
     regData,
@@ -41,6 +42,9 @@ const MapComponent = () => {
     setIsLoadingCompanies,
   } = useContext(QueriesContext);
   const { language } = useParams();
+
+  const mapRef = useRef(null);
+  const clusterRef = useRef(null);
 
   useEffect(() => {
     if (companiesData && companiesData.length > 0) {
@@ -57,13 +61,16 @@ const MapComponent = () => {
       if (typeof X !== "number" || typeof Y !== "number") return null;
 
       return (
-        <Marker key={index} position={[X, Y]}>
-          <Popup>
-            <strong>{Full_Name}</strong>
-            <br />
-            {Address}
-          </Popup>
-        </Marker>
+        <Marker
+          key={index}
+          position={[X, Y]}
+          eventHandlers={{
+            click: (e) => {
+              setSelectedMarker({ X, Y, Full_Name, Address });
+              e.originalEvent.stopPropagation(); // Prevent map click from resetting immediately
+            },
+          }}
+        />
       );
     });
   }, [companiesData]);
@@ -101,7 +108,7 @@ const MapComponent = () => {
         });
       }
     });
-  }, [zoomLevel]); // 👈
+  }, [zoomLevel]);
 
   const setupMunsHoverListeners = useCallback(() => {
     Object.values(munRefs.current).forEach((geoJsonLayer) => {
@@ -142,9 +149,13 @@ const MapComponent = () => {
     setupMunsHoverListeners();
   }, [munsReady, setupMunsHoverListeners]);
 
+  useEffect(() => {
+    setSelectedMarker(null);
+  }, [zoomLevel]);
+
   return (
     <>
-      <MapContainer center={center} zoom={8} zoomControl={false}>
+      <MapContainer center={center} zoom={8} zoomControl={false} ref={mapRef}>
         <LayersControl>
           <LayersControl.BaseLayer checked name="Google Terrain">
             <TileLayer
@@ -166,7 +177,6 @@ const MapComponent = () => {
                 subdomains={["mt0", "mt1", "mt2", "mt3"]}
               />
             </LayersControl.BaseLayer>
-
             <LayersControl.BaseLayer name="Google Hybrid">
               <TileLayer
                 attribution='&copy; <a href="https://www.google.com/intl/en_us/help/terms_maps.html">Google</a>'
@@ -184,8 +194,20 @@ const MapComponent = () => {
         </LayersControl>
 
         {companiesData && Array.isArray(companiesData) && (
-          <MarkerClusterGroup iconCreateFunction={createCustomClusterIcon}>
+          <MarkerClusterGroup
+            iconCreateFunction={createCustomClusterIcon}
+            ref={clusterRef}
+            zoomToBoundsOnClick={true} // Ensure clicking zooms to cluster
+            spiderfyOnMaxZoom={true} // Ensure spiderfying at max zoom
+          >
             {markers}
+            {selectedMarker && (
+              <Popup position={[selectedMarker.X, selectedMarker.Y]}>
+                <strong>{selectedMarker.Full_Name}</strong>
+                <br />
+                {selectedMarker.Address}
+              </Popup>
+            )}
           </MarkerClusterGroup>
         )}
 
@@ -225,7 +247,6 @@ const MapComponent = () => {
               <GeoJSON
                 ref={(el) => {
                   regionRefs.current[key] = el;
-
                   if (
                     Object.keys(regionRefs.current).length ===
                     Object.entries(regions).length
@@ -238,7 +259,6 @@ const MapComponent = () => {
                 style={getStyle(value, zoomLevel, "region", regColor)}>
                 <Popup>
                   <p className="popup-para">{region[`name_${language}`]}</p>
-
                   {typeof regionNumber === "number" &&
                     value.id !== "12" &&
                     value.id !== "48" && (
@@ -246,15 +266,13 @@ const MapComponent = () => {
                         <p className="popup-para">{indicator}</p>
                         <p>
                           {regionNumber.toFixed(1)} (
-                          {indicatorInfo[`measurement_${language}`]}){" "}
+                          {indicatorInfo[`measurement_${language}`]})
                         </p>
                       </>
                     )}
-
                   {regionFemaleNumber && (
                     <>
                       <p className="popup-para">{region[`NAME_GE`]}</p>
-
                       <p className="popup-para">{indicator}</p>
                       <p>
                         <span style={{ fontWeight: 900 }}>
@@ -305,7 +323,6 @@ const MapComponent = () => {
                   if (geoJsonRef) {
                     munRefs.current[id] = geoJsonRef;
                   }
-
                   if (
                     Object.keys(munRefs.current).length ===
                     municipalities.features.length
