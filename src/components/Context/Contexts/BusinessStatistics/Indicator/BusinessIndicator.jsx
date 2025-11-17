@@ -1,5 +1,5 @@
 import "./BusinessIndicator.scss";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useParams } from "react-router";
 import { QueriesContext } from "../../../../../App";
 import AngleRight from "./AngleRight";
@@ -21,6 +21,12 @@ const BusinessIndicator = () => {
   const { language } = useParams();
   const [isMunOpen, setIsMunOpen] = useState(null);
   const [selectedRegionId, setSelectedRegionId] = useState(null);
+
+  // Reset open municipality when indicator changes
+  useEffect(() => {
+    setIsMunOpen(null);
+    setSelectedRegionId(null);
+  }, [indicator]);
 
   let sortedMuns;
   const isByGender =
