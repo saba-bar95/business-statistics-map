@@ -13,9 +13,11 @@ import fetchPayGender from "./functions/fetchPayGender";
 import fetchRegionData from "./functions/fetchRegionData";
 import fetchRegionGenderData from "./functions/fetchRegionGenderData";
 import fetchCompaniesData from "./functions/fetchCompaniesData";
-import fetchLegalForms from "./functions/fetchLegalForms";
 import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
-import fetchActivities from "./functions/fetchActitivities";
+import { Analytics } from "@vercel/analytics/react";
+
+// import fetchLegalForms from "./functions/fetchLegalForms";
+// import fetchActivities from "./functions/fetchActitivities";
 
 export const QueriesContext = createContext();
 
@@ -38,12 +40,12 @@ function App() {
   const [selectedRegion, setSelectedRegion] = useState(null);
   const [yearlyRegionData, setYearlyRegionData] = useState([]);
   const [selectedFindRegionID, setSelectedFindRegionId] = useState("");
-  const [legalForms, setLegalForms] = useState("");
   const [selectedFormID, setSelectedFormID] = useState("");
   const [companiesData, setCompaniesData] = useState(null);
   const [isLoadingCompanies, setIsLoadingCompanies] = useState(false);
-  const [activities, setActivities] = useState("");
   const [selectedActivityID, setSelectedActivityID] = useState("");
+  // const [activities, setActivities] = useState("");
+  // const [legalForms, setLegalForms] = useState("");
 
   useEffect(() => {
     if (regData && selectedRegionID) {
@@ -203,31 +205,31 @@ function App() {
     setMunData,
   ]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await fetchActivities(language);
-        if (data) setActivities(data);
-      } catch (err) {
-        console.error("Error fetching legal forms:", err);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const data = await fetchActivities(language);
+  //       if (data) setActivities(data);
+  //     } catch (err) {
+  //       console.error("Error fetching legal forms:", err);
+  //     }
+  //   };
 
-    fetchData();
-  }, [language, setActivities]);
+  //   fetchData();
+  // }, [language, setActivities]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await fetchLegalForms(language);
-        if (data) setLegalForms(data);
-      } catch (err) {
-        console.error("Error fetching legal forms:", err);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const data = await fetchLegalForms(language);
+  //       if (data) setLegalForms(data);
+  //     } catch (err) {
+  //       console.error("Error fetching legal forms:", err);
+  //     }
+  //   };
 
-    fetchData();
-  }, [language, setLegalForms]);
+  //   fetchData();
+  // }, [language, setLegalForms]);
 
   useEffect(() => {
     if (!selectedFindRegionID || selectedFindRegionID === 0) {
@@ -288,12 +290,12 @@ function App() {
         setSelectedRegion,
         selectedFindRegionID,
         setSelectedFindRegionId,
-        legalForms,
         setSelectedFormID,
         companiesData,
-        activities,
         setSelectedActivityID,
         setIsLoadingCompanies,
+        // activities,
+        // legalForms,
       }}>
       <div className="app-container">
         {isLoadingCompanies && <LoadingSpinner />}
@@ -303,6 +305,7 @@ function App() {
         </div>
         <ColorBox />
         <LanguageChanger />
+        <Analytics />
       </div>
     </QueriesContext.Provider>
   );

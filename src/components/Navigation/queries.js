@@ -24,11 +24,11 @@ const queries = [
           name_ge: "ჰისტოგრამა",
           name_en: "Histogram",
         },
-        {
-          href: "gis",
-          name_ge: "მოძებნე ბიზნეს სუბიექტი",
-          name_en: "Find business entity",
-        },
+        // {
+        //   href: "gis",
+        //   name_ge: "მოძებნე ბიზნეს სუბიექტი",
+        //   name_en: "Find business entity",
+        // },
       ];
     },
   },
