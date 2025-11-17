@@ -34,3 +34,36 @@
     font-weight: 900;
   }
 }
+
+@media (min-width: 769px) and (max-width: 1200px) {
+  /* … */
+  .popup-para {
+    margin: 1em 0 !important;
+  }
+
+  .leaflet-popup-content {
+    margin: 0 10px;
+  }
+
+  p {
+    margin: 5px 0 !important;
+    font-size: 12px !important;
+  }
+}
+
+@media (min-width: 0) and (max-width: 768px) {
+  /* … */
+  .popup-para {
+    font-size: 11px;
+    margin: 0.7em 0 !important;
+  }
+
+  .leaflet-popup-content {
+    margin: 0 10px;
+  }
+
+  p {
+    margin: 5px 0 !important;
+    font-size: 11px !important;
+  }
+}

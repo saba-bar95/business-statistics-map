@@ -30,3 +30,40 @@
     }
   }
 }
+
+@media (min-width: 769px) and (max-width: 1200px) {
+  .colorbox-container {
+    margin: 0;
+    padding: 5px;
+
+    h1 {
+      font-size: 13px;
+      margin-bottom: 5px;
+    }
+
+    .para-container {
+      p {
+        margin: 2px !important;
+      }
+    }
+  }
+}
+
+@media (min-width: 0) and (max-width: 768px) {
+  .colorbox-container {
+    margin: 0;
+    padding: 5px;
+
+    h1 {
+      font-size: 12px;
+      margin-bottom: 5px;
+      max-width: 250px;
+    }
+
+    .para-container {
+      p {
+        margin: 2px !important;
+      }
+    }
+  }
+}

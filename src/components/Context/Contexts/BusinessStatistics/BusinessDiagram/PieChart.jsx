@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useLayoutEffect, useMemo } from "react";
+import { useLayoutEffect, useMemo, useState, useEffect } from "react";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5percent from "@amcharts/amcharts5/percent";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
@@ -8,25 +8,31 @@ import { useParams } from "react-router";
 const PieChart = ({ data, year }) => {
   const { language } = useParams();
 
-  // 🎨 Color palette by region_id with name references
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const colorPalette = useMemo(() => {
     return {
-      11: "rgb(103, 183, 220)", // C. Tbilisi
-      15: "rgb(253, 212, 0)", // Adjara A.R.
-      23: "rgb(132, 183, 97)", // Guria
-      26: "rgb(204, 71, 72)", // Imereti
-      29: "rgb(205, 130, 173)", // Kakheti
-      32: "rgb(47, 64, 116)", // Mtskheta-Mtianeti
-      35: "rgb(183, 184, 63)", // Racha-Lechkhumi and Kvemo Svaneti
-      38: "rgb(185, 120, 63)", // Samegrelo-Zemo Svaneti
-      41: "rgb(185, 62, 61)", // Samtskhe-Javakheti
-      44: "rgb(68, 142, 77)", // Kvemo Kartli
-      47: "rgb(145, 49, 103)", // Shida Kartli
-      default: "#1a0c1b", // fallback
+      11: "rgb(103, 183, 220)",
+      15: "rgb(253, 212, 0)",
+      23: "rgb(132, 183, 97)",
+      26: "rgb(204, 71, 72)",
+      29: "rgb(205, 130, 173)",
+      32: "rgb(47, 64, 116)",
+      35: "rgb(183, 184, 63)",
+      38: "rgb(185, 120, 63)",
+      41: "rgb(185, 62, 61)",
+      44: "rgb(68, 142, 77)",
+      47: "rgb(145, 49, 103)",
+      default: "#1a0c1b",
     };
   }, []);
 
-  // 🧠 Filter and colorize data
   const coloredData = useMemo(() => {
     return data
       .filter(
@@ -46,15 +52,13 @@ const PieChart = ({ data, year }) => {
     root._logo.dispose();
     root.setThemes([am5themes_Animated.new(root)]);
 
-    // 📊 Create chart with vertical layout
     const chart = root.container.children.push(
       am5percent.PieChart.new(root, {
-        layout: root.verticalLayout, // 👈 ensures chart and legend stack
+        layout: root.verticalLayout,
         paddingTop: -90,
       })
     );
 
-    // 🥧 Pie series setup
     const series = chart.series.push(
       am5percent.PieSeries.new(root, {
         valueField: `w_${year}`,
@@ -92,17 +96,15 @@ const PieChart = ({ data, year }) => {
 
     series.set("tooltip", tooltip);
     series.data.setAll(coloredData);
-
     series.appear(1000, 100);
 
-    // 📘 Add legend
     const legend = chart.children.push(
       am5.Legend.new(root, {
         y: am5.percent(0),
         centerY: am5.percent(-120),
         x: am5.percent(50),
         centerX: am5.percent(50),
-        width: am5.percent(100), // 👈 full width of chart container
+        width: am5.percent(100),
         useDefaultMarker: true,
       })
     );
@@ -112,7 +114,7 @@ const PieChart = ({ data, year }) => {
     });
 
     legend.labels.template.setAll({
-      fontSize: 14,
+      fontSize: windowWidth < 769 ? 12 : windowWidth < 1201 ? 13 : 14,
       fontWeight: "600",
       fontFamily: "Verdana",
       oversizedBehavior: "wrap",
@@ -120,16 +122,20 @@ const PieChart = ({ data, year }) => {
     });
 
     legend.valueLabels.template.setAll({
-      fontSize: 13,
+      // fontSize: 13,
+      fontSize: windowWidth < 769 ? 11 : windowWidth < 1201 ? 12 : 13,
       fontWeight: "600",
       fontFamily: "Verdana",
-      x: am5.percent(100),
+      // x: am5.percent(100),
+      x: am5.percent(windowWidth < 769 ? 100 : windowWidth < 1201 ? 90 : 95),
       textAlign: "right",
     });
 
     legend.markers.template.setAll({
-      width: 15,
-      height: 15,
+      // width: 15,
+      // height: 15,
+      width: windowWidth < 769 ? 11 : windowWidth < 1201 ? 13 : 15,
+      height: windowWidth < 769 ? 11 : windowWidth < 1201 ? 13 : 15,
     });
 
     const sortedDataItems = [...series.dataItems].sort((a, b) => {
@@ -147,11 +153,22 @@ const PieChart = ({ data, year }) => {
     });
 
     return () => root.dispose();
-  }, [coloredData, language, year]);
+  }, [coloredData, language, year, windowWidth]);
 
   return (
     <div style={{ width: "100%", maxHeight: "80vh", overflow: "auto" }}>
-      <div id="chartdiv" style={{ width: "300px", minHeight: "700px" }}></div>
+      <div
+        id="chartdiv"
+        style={{
+          width:
+            windowWidth < 769
+              ? "200px"
+              : windowWidth < 1201
+              ? "280px"
+              : "350px",
+          minHeight: "700px",
+        }}
+      />
     </div>
   );
 };
