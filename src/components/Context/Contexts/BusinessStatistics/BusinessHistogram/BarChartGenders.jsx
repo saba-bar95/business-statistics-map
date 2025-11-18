@@ -28,7 +28,7 @@ const BarChartGenders = ({ data }) => {
     root._logo?.dispose();
     root.setThemes([am5themes_Animated.new(root)]);
 
-    // THIS IS THE MAGIC: forces all numbers to show with comma + exactly 1 decimal
+    // Clean number format: 1,234.0
     root.numberFormatter.set("numberFormat", "#,###.0");
 
     const chart = root.container.children.push(
@@ -38,7 +38,8 @@ const BarChartGenders = ({ data }) => {
         wheelX: "none",
         wheelY: "none",
         paddingLeft: 0,
-        paddingRight: 60,
+        paddingRight: 20,
+        paddingBottom: 100,
         layout: root.verticalLayout,
       })
     );
@@ -64,11 +65,18 @@ const BarChartGenders = ({ data }) => {
       am5xy.ValueAxis.new(root, {
         min: 0,
         extraMax: 0.1,
-        renderer: am5xy.AxisRendererX.new(root, { strokeOpacity: 0.1 }),
+        renderer: am5xy.AxisRendererX.new(root, {
+          strokeOpacity: 0.1,
+          minGridDistance: 60,
+        }),
       })
     );
 
+    // Responsive fonts
     const axisFontSize = windowWidth < 769 ? 11 : windowWidth < 1201 ? 12 : 13;
+    const bulletFontSize =
+      windowWidth < 769 ? 10 : windowWidth < 1201 ? 11 : 12;
+
     yRenderer.labels.template.setAll({
       fontSize: axisFontSize,
       fontFamily: "Verdana",
@@ -146,7 +154,7 @@ const BarChartGenders = ({ data }) => {
         sprite: am5.Label.new(root, {
           text: "{valueX}",
           fill: am5.color("#ffffff"),
-          fontSize: windowWidth < 769 ? 10 : 11,
+          fontSize: bulletFontSize,
           fontWeight: "600",
           fontFamily: "Verdana",
           centerX: am5.p50,
@@ -185,7 +193,7 @@ const BarChartGenders = ({ data }) => {
         sprite: am5.Label.new(root, {
           text: "{valueX}",
           fill: am5.color("#ffffff"),
-          fontSize: windowWidth < 769 ? 10 : 11,
+          fontSize: bulletFontSize,
           fontWeight: "600",
           fontFamily: "Verdana",
           centerX: am5.p50,
@@ -205,17 +213,23 @@ const BarChartGenders = ({ data }) => {
     return () => root.dispose();
   }, [formattedData, windowWidth, maleText, femaleText]);
 
+  // Same responsive container as BarChart
   const chartWidth =
-    windowWidth < 769 ? "280px" : windowWidth < 1201 ? "360px" : "420px";
-  const chartHeight = windowWidth < 769 ? "520px" : "580px";
+    windowWidth < 769 ? "260px" : windowWidth < 1201 ? "320px" : "380px";
 
   return (
-    <div style={{ width: "100%", maxHeight: "80vh", overflow: "auto" }}>
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        overflow: "auto",
+        flex: 1,
+      }}>
       <div
         id="chartdiv"
         style={{
           width: chartWidth,
-          minHeight: chartHeight,
+          height: "100%",
           margin: "0 auto",
         }}
       />

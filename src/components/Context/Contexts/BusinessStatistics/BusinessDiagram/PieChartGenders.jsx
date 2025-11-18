@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useLayoutEffect, useMemo } from "react";
+import { useLayoutEffect, useMemo, useState, useEffect } from "react";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5percent from "@amcharts/amcharts5/percent";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
@@ -7,6 +7,15 @@ import { useParams } from "react-router";
 
 const PieChartGenders = ({ data, year }) => {
   const { language } = useParams();
+
+  // Responsive window width
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const colorPalette = useMemo(
     () => ({
@@ -57,13 +66,27 @@ const PieChartGenders = ({ data, year }) => {
 
   useLayoutEffect(() => {
     const root = am5.Root.new("chartdiv");
-    root._logo.dispose();
+    root._logo?.dispose();
     root.setThemes([am5themes_Animated.new(root)]);
+
+    // Force clean number format: 1,234.0
+    root.numberFormatter.set("numberFormat", "#,###.0");
 
     const chart = root.container.children.push(
       am5percent.PieChart.new(root, {
         layout: root.verticalLayout,
-        paddingTop: -40,
+        paddingTop:
+          language === "en"
+            ? windowWidth < 769
+              ? -190
+              : windowWidth < 1201
+              ? -175
+              : -130
+            : windowWidth < 769
+            ? -150
+            : windowWidth < 1201
+            ? -160
+            : -120,
       })
     );
 
@@ -78,8 +101,9 @@ const PieChartGenders = ({ data, year }) => {
     series.labels.template.setAll({ forceHidden: true });
     series.ticks.template.setAll({ forceHidden: true });
 
-    const tooltipText =
-      "{category}\n👩 {female.formatNumber('0.0')} ({femalePercent.formatNumber('0.0')}%)\n👨 {male.formatNumber('0.0')} ({malePercent.formatNumber('0.0')}%)";
+    const femaleLabel = language === "en" ? "Female" : "ქალი";
+    const maleLabel = language === "en" ? "Male" : "კაცი";
+    const tooltipText = `{category}\n[bold]${femaleLabel}[/]: {female} ({femalePercent.formatNumber('0.0')}%)\n[bold]${maleLabel}[/]: {male} ({malePercent.formatNumber('0.0')}%)`;
 
     series.slices.template.setAll({
       stroke: am5.color(0xffffff),
@@ -89,24 +113,72 @@ const PieChartGenders = ({ data, year }) => {
       interactive: true,
     });
 
-    const tooltip = am5.Tooltip.new(root, { labelText: tooltipText });
+    // PROFESSIONAL DARK TOOLTIP — same as other charts
+    const tooltip = am5.Tooltip.new(root, {
+      getFillFromSprite: false,
+      autoTextColor: false,
+    });
+
+    tooltip.get("background")?.setAll({
+      fill: am5.color("#1a1a1a"),
+      fillOpacity: 0.95,
+      stroke: am5.color("#444444"),
+      strokeWidth: 1,
+      strokeOpacity: 0.6,
+      cornerRadius: 8,
+    });
+
+    const tooltipFontSize =
+      language === "en"
+        ? windowWidth < 769
+          ? 9
+          : windowWidth < 1201
+          ? 12
+          : 13
+        : windowWidth < 769
+        ? 10
+        : windowWidth < 1201
+        ? 13
+        : 14;
 
     tooltip.label.setAll({
-      fontSize: 13,
+      fill: am5.color("#ffffff"),
+      fontSize: tooltipFontSize,
       fontWeight: "600",
       fontFamily: "Verdana",
+    });
+
+    const paddingV = windowWidth < 769 ? 3 : windowWidth < 1201 ? 5 : 7;
+    const paddingH = windowWidth < 769 ? 6 : windowWidth < 1201 ? 9 : 12;
+
+    tooltip.setAll({
+      paddingTop: paddingV,
+      paddingBottom: paddingV,
+      paddingLeft: paddingH,
+      paddingRight: paddingH,
     });
 
     series.set("tooltip", tooltip);
     series.data.setAll(coloredData);
     series.appear(1000, 100);
 
-    const centerYOffset = language === "en" ? -120 : -110;
-
+    // Responsive legend
     const legend = chart.children.push(
       am5.Legend.new(root, {
         y: am5.percent(0),
-        centerY: am5.percent(centerYOffset),
+        centerY: am5.percent(
+          language === "en"
+            ? windowWidth < 769
+              ? -105
+              : windowWidth < 1201
+              ? -150
+              : -135
+            : windowWidth < 769
+            ? -80
+            : windowWidth < 1201
+            ? -125
+            : -110
+        ),
         x: am5.percent(50),
         centerX: am5.percent(50),
         width: am5.percent(100),
@@ -119,39 +191,73 @@ const PieChartGenders = ({ data, year }) => {
     });
 
     legend.labels.template.setAll({
-      fontSize: 14,
+      fontSize:
+        language === "en"
+          ? windowWidth < 769
+            ? 11
+            : windowWidth < 1201
+            ? 12
+            : 13
+          : windowWidth < 769
+          ? 12
+          : windowWidth < 1201
+          ? 13
+          : 14,
       fontWeight: "600",
       fontFamily: "Verdana",
-      oversizedBehavior: "truncate",
-      maxWidth: 200,
+      oversizedBehavior: "wrap",
+      maxWidth:
+        language === "en"
+          ? windowWidth < 769
+            ? 120
+            : windowWidth < 1201
+            ? 185
+            : 200
+          : windowWidth < 769
+          ? 120
+          : windowWidth < 1201
+          ? 185
+          : 200,
+      maxHeight: 30,
     });
 
     legend.valueLabels.template.setAll({
-      fontSize: 13,
+      fontSize: windowWidth < 769 ? 11 : windowWidth < 1201 ? 12 : 13,
       fontWeight: "600",
       fontFamily: "Verdana",
-      x: am5.percent(100),
+      x: am5.percent(windowWidth < 769 ? 100 : windowWidth < 1201 ? 90 : 95),
       textAlign: "right",
-      text: "👩 {female.formatNumber('0.0')} / 👨 {male.formatNumber('0.0')}",
+      text: "Female {female} / Male {male}",
     });
 
     legend.markers.template.setAll({
-      width: 15,
-      height: 15,
+      width: windowWidth < 769 ? 11 : windowWidth < 1201 ? 13 : 15,
+      height: windowWidth < 769 ? 11 : windowWidth < 1201 ? 13 : 15,
     });
 
     const sortedDataItems = [...series.dataItems].sort((a, b) => {
       return b.get("value") - a.get("value");
     });
-
     legend.data.setAll(sortedDataItems);
 
     return () => root.dispose();
-  }, [coloredData, language]);
+  }, [coloredData, language, year, windowWidth]);
 
   return (
     <div style={{ width: "100%", maxHeight: "80vh", overflow: "auto" }}>
-      <div id="chartdiv" style={{ width: "300px", minHeight: "700px" }}></div>
+      <div
+        id="chartdiv"
+        style={{
+          width:
+            windowWidth < 769
+              ? "200px"
+              : windowWidth < 1201
+              ? "280px"
+              : "290px",
+          minHeight: "700px",
+          margin: "0 auto",
+        }}
+      />
     </div>
   );
 };

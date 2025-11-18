@@ -31,8 +31,9 @@ const BusinessHistogram = () => {
   }, []);
 
   // Responsive gap: 0 if < 900px, otherwise 20px
-  const responsiveGap = windowWidth < 900 ? 0 : "20px";
-  const responsiveWidth = windowWidth < 768 ? "auto" : "100%";
+  const responsiveGap = windowWidth < 1201 ? "10px" : "20px";
+  const responsiveWidth = windowWidth < 1201 ? "100%" : "100%";
+  const flexDirection = windowWidth < 1201 ? "column" : "row";
 
   return (
     <div className="business-indicator">
@@ -42,12 +43,12 @@ const BusinessHistogram = () => {
         <IndicatorsSelect />
       </div>
 
-      {/* RESPONSIVE GAP HERE */}
       <div
         className="container"
         style={{
           display: "flex",
           gap: responsiveGap,
+          flexDirection: flexDirection,
           width: responsiveWidth,
           justifyContent: "space-between",
         }}>

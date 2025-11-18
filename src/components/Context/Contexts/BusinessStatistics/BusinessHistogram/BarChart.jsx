@@ -30,7 +30,8 @@ const BarChart = ({ data }) => {
         wheelX: "none",
         wheelY: "none",
         paddingLeft: 0,
-        paddingRight: 40,
+        paddingRight: 20,
+        paddingBottom: 100,
         layout: root.verticalLayout,
       })
     );
@@ -75,12 +76,10 @@ const BarChart = ({ data }) => {
       fontSize: axisFontSize,
       fontFamily: "Verdana",
     });
-    xAxis
-      .get("renderer")
-      .labels.template.setAll({
-        fontSize: axisFontSize,
-        fontFamily: "Verdana",
-      });
+    xAxis.get("renderer").labels.template.setAll({
+      fontSize: axisFontSize,
+      fontFamily: "Verdana",
+    });
 
     // Series
     const series = chart.series.push(
@@ -166,16 +165,20 @@ const BarChart = ({ data }) => {
   // Responsive container size (same logic as your PieChart)
   const chartWidth =
     windowWidth < 769 ? "260px" : windowWidth < 1201 ? "320px" : "380px";
-  const chartHeight = windowWidth < 769 ? "500px" : "550px";
 
   return (
-    <div style={{ width: "100%", maxHeight: "80vh", overflow: "auto" }}>
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        overflow: "auto",
+        flex: 1,
+      }}>
       <div
         id="chartdiv"
         style={{
           width: chartWidth,
-          minHeight: chartHeight,
-          margin: "0 auto",
+          height: "100%",
         }}
       />
     </div>
