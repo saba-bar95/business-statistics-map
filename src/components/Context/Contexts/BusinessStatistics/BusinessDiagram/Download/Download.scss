@@ -96,8 +96,12 @@
 
 .hist-download-container {
   z-index: 1;
-  top: 175px;
+  top: 150px;
   right: 20px;
+
+  @media (min-width: 0) and (max-width: 1200px) {
+    top: 200px;
+  }
 }
 
 @media (min-width: 769px) and (max-width: 1200px) {
