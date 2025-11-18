@@ -49,13 +49,24 @@ const PieChart = ({ data, year }) => {
 
   useLayoutEffect(() => {
     const root = am5.Root.new("chartdiv");
-    root._logo.dispose();
+    root._logo?.dispose();
     root.setThemes([am5themes_Animated.new(root)]);
 
     const chart = root.container.children.push(
       am5percent.PieChart.new(root, {
         layout: root.verticalLayout,
-        paddingTop: -90,
+        paddingTop:
+          language === "en"
+            ? windowWidth < 769
+              ? -140
+              : windowWidth < 1201
+              ? -175
+              : -130
+            : windowWidth < 769
+            ? -200
+            : windowWidth < 1201
+            ? -150
+            : -130,
       })
     );
 
@@ -78,30 +89,72 @@ const PieChart = ({ data, year }) => {
       cursorOverStyle: "pointer",
     });
 
-    series.slices.template.setAll({
-      tooltipText:
+    // TOOLTIP
+    const tooltip = am5.Tooltip.new(root, {
+      labelText:
         "{category}: {value} ({valuePercentTotal.formatNumber('0.0')}%)",
     });
 
-    const tooltip = am5.Tooltip.new(root, {
-      labelText:
-        "{category}:  [fontSize: 12px]{value} [fontSize: 12px]({valuePercentTotal.formatNumber('0.0')}%)",
-    });
+    // RESPONSIVE FONT SIZE (on label)
+    const fontSize =
+      language === "en"
+        ? windowWidth < 769
+          ? 9
+          : windowWidth < 1201
+          ? 12
+          : 13
+        : windowWidth < 769
+        ? 10
+        : windowWidth < 1201
+        ? 13
+        : 14;
 
     tooltip.label.setAll({
-      fontSize: 13,
+      fontSize,
       fontWeight: "600",
       fontFamily: "Verdana",
     });
 
+    // RESPONSIVE PADDING — THIS IS THE CORRECT WAY (on tooltip, not label!)
+    const paddingVertical = windowWidth < 769 ? 3 : windowWidth < 1201 ? 5 : 7;
+    const paddingHorizontal =
+      windowWidth < 769 ? 6 : windowWidth < 1201 ? 9 : 12;
+
+    tooltip.setAll({
+      paddingTop: paddingVertical,
+      paddingBottom: paddingVertical,
+      paddingLeft: paddingHorizontal,
+      paddingRight: paddingHorizontal,
+      background: am5.RoundedRectangle.new(root, {
+        cornerRadiusTL: 6,
+        cornerRadiusTR: 6,
+        cornerRadiusBL: 6,
+        cornerRadiusBR: 6,
+      }),
+    });
+
     series.set("tooltip", tooltip);
+
     series.data.setAll(coloredData);
     series.appear(1000, 100);
 
+    // Legend (unchanged - your code is perfect)
     const legend = chart.children.push(
       am5.Legend.new(root, {
         y: am5.percent(0),
-        centerY: am5.percent(-120),
+        centerY: am5.percent(
+          language === "en"
+            ? windowWidth < 769
+              ? -95
+              : windowWidth < 1201
+              ? -150
+              : -135
+            : windowWidth < 769
+            ? -145
+            : windowWidth < 1201
+            ? -135
+            : -125
+        ),
         x: am5.percent(50),
         centerX: am5.percent(50),
         width: am5.percent(100),
@@ -109,48 +162,59 @@ const PieChart = ({ data, year }) => {
       })
     );
 
-    legend.itemContainers.template.setAll({
-      width: am5.percent(100),
-    });
+    legend.itemContainers.template.setAll({ width: am5.percent(100) });
 
     legend.labels.template.setAll({
-      fontSize: windowWidth < 769 ? 12 : windowWidth < 1201 ? 13 : 14,
+      fontSize:
+        language === "en"
+          ? windowWidth < 769
+            ? 11
+            : windowWidth < 1201
+            ? 12
+            : 13
+          : windowWidth < 769
+          ? 12
+          : windowWidth < 1201
+          ? 13
+          : 14,
       fontWeight: "600",
       fontFamily: "Verdana",
       oversizedBehavior: "wrap",
-      maxWidth: 200,
+      maxWidth:
+        language === "en"
+          ? windowWidth < 769
+            ? 120
+            : windowWidth < 1201
+            ? 185
+            : 200
+          : windowWidth < 769
+          ? 120
+          : windowWidth < 1201
+          ? 185
+          : 200,
+      maxHeight: 30,
     });
 
     legend.valueLabels.template.setAll({
-      // fontSize: 13,
       fontSize: windowWidth < 769 ? 11 : windowWidth < 1201 ? 12 : 13,
       fontWeight: "600",
       fontFamily: "Verdana",
-      // x: am5.percent(100),
       x: am5.percent(windowWidth < 769 ? 100 : windowWidth < 1201 ? 90 : 95),
       textAlign: "right",
     });
 
     legend.markers.template.setAll({
-      // width: 15,
-      // height: 15,
       width: windowWidth < 769 ? 11 : windowWidth < 1201 ? 13 : 15,
       height: windowWidth < 769 ? 11 : windowWidth < 1201 ? 13 : 15,
     });
 
-    const sortedDataItems = [...series.dataItems].sort((a, b) => {
-      return b.get("value") - a.get("value");
-    });
-
+    const sortedDataItems = [...series.dataItems].sort(
+      (a, b) => b.get("value") - a.get("value")
+    );
     legend.data.setAll(sortedDataItems);
 
-    series.labels.template.setAll({
-      forceHidden: true,
-    });
-
-    series.ticks.template.setAll({
-      forceHidden: true,
-    });
+    series.labels.template.setAll({ forceHidden: true });
+    series.ticks.template.setAll({ forceHidden: true });
 
     return () => root.dispose();
   }, [coloredData, language, year, windowWidth]);
@@ -165,7 +229,7 @@ const PieChart = ({ data, year }) => {
               ? "200px"
               : windowWidth < 1201
               ? "280px"
-              : "350px",
+              : "290px",
           minHeight: "700px",
         }}
       />
