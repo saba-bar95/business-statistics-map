@@ -1,7 +1,7 @@
 import YearsSelect from "../YearsSelect";
 import IndicatorsSelect from "../IndicatorsSelect";
 import RegionSelect from "../RegionSelect";
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { QueriesContext } from "../../../../../App";
 import { useParams } from "react-router";
 import Download from "../BusinessDiagram/Download/Download";
@@ -21,6 +21,19 @@ const BusinessHistogram = () => {
   const { language } = useParams();
   const isGender = indicator === indicators[11] || indicator === indicators[12];
 
+  // Track window width for responsive gap
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Responsive gap: 0 if < 900px, otherwise 20px
+  const responsiveGap = windowWidth < 900 ? 0 : "20px";
+  const responsiveWidth = windowWidth < 768 ? "auto" : "100%";
+
   return (
     <div className="business-indicator">
       <div
@@ -28,17 +41,20 @@ const BusinessHistogram = () => {
         style={{ position: "relative", width: "100%" }}>
         <IndicatorsSelect />
       </div>
+
+      {/* RESPONSIVE GAP HERE */}
       <div
         className="container"
         style={{
           display: "flex",
-          gap: "20px",
-          width: "100%",
+          gap: responsiveGap,
+          width: responsiveWidth,
           justifyContent: "space-between",
         }}>
         <RegionSelect />
         <YearsSelect />
       </div>
+
       <div className="diagram-header">
         <p className="diagram-p">
           {selectedQuery[`title_${language}`]}: {indicator}
