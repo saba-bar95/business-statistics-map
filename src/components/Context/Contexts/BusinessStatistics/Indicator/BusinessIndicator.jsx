@@ -151,33 +151,36 @@ const BusinessIndicator = () => {
                     selectedRegionId === regId &&
                     regId !== "11" && (
                       <div className="mun-container">
-                        {sortedMuns
-                          .sort((a, b) => b.value - a.value)
-                          .map((mun) => {
-                            const name = municipalities.features
-                              .filter(
-                                (mun1) =>
-                                  mun1.properties.MUNICIPAL1 === mun.municipal_
-                              )
-                              .map((mun2) =>
-                                language === "en"
-                                  ? mun2.properties.NAME_EN
-                                  : mun2.properties.NAME_SYLFA
-                              );
+                        {sortedMuns &&
+                          sortedMuns
+                            .sort((a, b) => b.value - a.value)
+                            .map((mun) => {
+                              const name = municipalities.features
+                                .filter(
+                                  (mun1) =>
+                                    mun1.properties.MUNICIPAL1 ===
+                                    mun.municipal_
+                                )
+                                .map((mun2) =>
+                                  language === "en"
+                                    ? mun2.properties.NAME_EN
+                                    : mun2.properties.NAME_SYLFA
+                                );
 
-                            return (
-                              <div className="mun-paras" key={mun.municipal_}>
-                                <p>{name}</p>
-                                <p>
-                                  {typeof mun[`w_${indicatorYear}`] === "number"
-                                    ? mun[`w_${indicatorYear}`].toFixed(1)
-                                    : typeof mun.value === "number"
-                                    ? mun.value.toFixed(1)
-                                    : "N/A"}
-                                </p>
-                              </div>
-                            );
-                          })}
+                              return (
+                                <div className="mun-paras" key={mun.municipal_}>
+                                  <p>{name}</p>
+                                  <p>
+                                    {typeof mun[`w_${indicatorYear}`] ===
+                                    "number"
+                                      ? mun[`w_${indicatorYear}`].toFixed(1)
+                                      : typeof mun.value === "number"
+                                      ? mun.value.toFixed(1)
+                                      : "N/A"}
+                                  </p>
+                                </div>
+                              );
+                            })}
                       </div>
                     )}
                 </div>
