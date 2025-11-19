@@ -1,8 +1,59 @@
-# React + Vite
+## ⚡ Project: Business Statistics Map
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Interactive Business Statistics Dashboard for Georgia** - Built as a free, accessible tool for researchers, journalists, students, local governments, and anyone interested in Georgia’s economic geography.
 
-Currently, two official plugins are available:
+Explore turnover, employment, value added, and 10+ other indicators – from regional level down to every single municipality.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
+
+### ✨ Features
+
+- 🗺️ Interactive Georgia **map** with zoom to all **municipalities** and **regions**
+- 📊 Dynamic **pie charts + histograms** for business indicators
+- 🎛️ Instantly switch **indicators** (turnover, employment, value added, etc.)
+- 📅 Select **years** with easy dropdown
+- 💾 Export charts & data: **PDF • Excel • JPG • PNG**
+- 🌐 Fully bilingual – **Georgian** ↔ **English** (auto + toggle)
+- 📱 100% responsive – perfect on **phones**, **tablets** & **desktop**
+
+---
+
+### 🛠️ Technologies Used
+
+- ⚛️ **Frontend:** [React](https://reactjs.org/)
+- 🔄 **State Management:** [Context API](https://react.dev/learn/passing-data-deeply-with-context)
+- 📈 **Charts & Visualization:** [amCharts](https://www.amcharts.com/)
+- 🗺 **Maps:** GeoJSON and [React Leaflet](https://react-leaflet.js.org/)
+- 🎨 **Styling:** [SCSS](https://sass-lang.com/)
+- 🚀 **Deployment:** [Vercel](https://vercel.com/)
+
+---
+
+### 🔧 Getting Started
+
+To run this project locally:
+
+```bash
+git clone https://github.com/saba-bar95/business-statistics-map
+cd business-statistics-map
+npm install
+npm run dev
+```
+
+---
+
+### 🌍 Live Demo
+
+🔗 [Visit Business Statistics Map](https://business-statistics-map.vercel.app/en)
+
+---
+
+### 🖼️ Screenshot
+
+![Overview of the Business Statistics Map](overview.png)
+
+---
+
+### 👨‍💻 Author
+
+[Saba Barbakadze – GitHub Profile](https://github.com/saba-bar95)
